@@ -1,5 +1,5 @@
-# Use a lightweight Java 17 base image
-FROM openjdk:17-jdk-slim
+# Use Amazon's official Java 17 image
+FROM amazoncorretto:17-al2-jdk
 
 # Set a working directory inside the container
 WORKDIR /app
