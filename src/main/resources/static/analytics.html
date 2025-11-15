@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Query Analytics</title>
+    <!-- We need the Chart.js library to draw charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- We will re-use the *exact* same CSS from index.html -->
+    <style>
+        :root {
+            --dark-blue: #1a202c;
+            --light-blue: #2d3748;
+            --text-light: #e2e8f0;
+            --text-dark: #a0aec0;
+            --highlight: #3182ce;
+            --bg-light: #f7fafc;
+            --border-color: #4a5568;
+            --priority-high: #fff5f5;
+            --priority-high-text: #c53030;
+            --priority-high-border: #fca5a5;
+            --priority-medium: #fffaf0;
+            --priority-medium-text: #c05621;
+            --priority-medium-border: #fbd38d;
+            --priority-low: #f0fff4;
+            --priority-low-text: #2f855a;
+            --priority-low-border: #9ae6b4;
+            --status-new: #e6fffa;
+            --status-new-text: #2c7a7b;
+            --status-progress: #ebf8ff;
+            --status-progress-text: #2b6cb0;
+            --status-resolved: #f7fafc;
+            --status-resolved-text: #718096;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            background: var(--bg-light);
+            color: var(--dark-blue);
+        }
+
+        /* --- Sidebar Navigation --- */
+        .sidebar {
+            width: 240px;
+            background: var(--dark-blue);
+            color: var(--text-light);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0; /* Prevents sidebar from shrinking */
+        }
+        .sidebar-header {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+        .sidebar-header span {
+            color: var(--highlight);
+        }
+        .sidebar-nav a {
+            display: block;
+            color: var(--text-dark);
+            text-decoration: none;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .sidebar-nav a.active,
+        .sidebar-nav a:hover {
+            background: var(--light-blue);
+            color: var(--text-light);
+        }
+
+        /* --- Main Content Area --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+        .main-header {
+            margin-bottom: 20px;
+        }
+        .main-header h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        /* --- Card Styling --- */
+        .card {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+        .card h2 {
+            margin-top: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        /* --- Chart Grid --- */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .chart-container {
+            height: 350px;
+            position: relative;
+        }
+
+        .loading-spinner {
+            display: none;
+            margin: 20px auto;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--highlight);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body onload="loadAnalytics()"> <!-- Load analytics on page load -->
+
+<!-- Sidebar -->
+<nav class="sidebar">
+    <div class="sidebar-header">
+        AI Inbox <span>Pro</span>
+    </div>
+    <div class="sidebar-nav">
+        <!-- Link back to the inbox -->
+        <a href="/index.html">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 10px; vertical-align: middle;">
+                <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555zM0 4.697v7.104l5.803-3.558L0 4.697zM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757zm3.436-.586L16 11.801V4.697l-5.803 3.546z"/>
+            </svg>
+            Unified Inbox
+        </a>
+        <!-- This is now the active page -->
+        <a href="/analytics.html" class="active">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 10px; vertical-align: middle;">
+                <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h-4V2zm-6 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12H5V2zM0 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12H0V2z"/>
+            </svg>
+            Analytics
+        </a>
+        <a href="#">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 10px; vertical-align: middle;">
+                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                <path d="M9.796 1.343c.527-1.79 3.065-1.79 3.592 0l.094.319a.873.873 0 0 0 1.255.52l.292-.16c1.64-.892 3.433.902 2.54 2.541l-.16.292a.873.873 0 0 0 .52 1.255l.319.094c1.79.527 1.79 3.065 0 3.592l-.319.094a.873.873 0 0 0-.52 1.255l.16.292c.892 1.64-.902 3.433-2.541 2.54l-.292-.16a.873.873 0 0 0-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 0 0-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.16-.292a.873.873 0 0 0-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 0 0 .52-1.255l-.16-.292c-.893-1.64.902-3.433 2.541-2.54l.292.16a.873.873 0 0 0 1.255.52l.094-.319zM8 13a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/>
+            </svg>
+            Settings
+        </a>
+    </div>
+</nav>
+
+<!-- Main content -->
+<main class="main-content">
+    <header class="main-header">
+        <h1>Analytics Dashboard</h1>
+    </header>
+
+    <div class="loading-spinner" id="loader" style="display: block;"></div>
+
+    <!-- This grid will hold our charts -->
+    <div class="chart-grid" id="chart-grid-container" style="display: none;">
+        <div class="card">
+            <h2>Queries by Type</h2>
+            <div class="chart-container">
+                <canvas id="category-chart"></canvas>
+            </div>
+        </div>
+        <div class="card">
+            <h2>Queries by Priority</h2>
+            <div class="chart-container">
+                <canvas id="priority-chart"></canvas>
+            </div>
+        </div>
+        <div class="card">
+            <h2>Queries by Status</h2>
+            <div class="chart-container">
+                <canvas id="status-chart"></canvas>
+            </div>
+        </div>
+        <div class="card">
+            <h2>Queries by Source</h2>
+            <div class="chart-container">
+                <canvas id="source-chart"></canvas>
+            </div>
+        </div>
+        <div class="card">
+            <h2>Avg. Response Time (Minutes)</h2>
+            <div class="chart-container">
+                <canvas id="response-time-chart"></canvas>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    const API_URL = '/api/queries';
+
+    async function loadAnalytics() {
+        const loader = document.getElementById('loader');
+        const grid = document.getElementById('chart-grid-container');
+
+        try {
+            const response = await fetch(API_URL);
+            const queries = await response.json();
+
+            // --- 1. Process data for existing charts ---
+            const categoryCounts = queries.reduce((acc, query) => {
+                acc[query.category] = (acc[query.category] || 0) + 1;
+                return acc;
+            }, {});
+
+            const priorityCounts = queries.reduce((acc, query) => {
+                acc[query.priority] = (acc[query.priority] || 0) + 1;
+                return acc;
+            }, {});
+
+            const statusCounts = queries.reduce((acc, query) => {
+                acc[query.status] = (acc[query.status] || 0) + 1;
+                return acc;
+            }, {});
+
+            const sourceCounts = queries.reduce((acc, query) => {
+                acc[query.source] = (acc[query.source] || 0) + 1;
+                return acc;
+            }, {});
+
+            // --- 2. NEW: Calculate Average Response Time ---
+
+            // Filter for only queries that are Resolved AND have both timestamps
+            const resolvedQueries = queries.filter(q =>
+                q.status === 'Resolved' && q.createdAt && q.resolvedAt
+            );
+
+            let avgMinutes = 0; // Default to 0
+
+            if (resolvedQueries.length > 0) {
+                // Map to an array of response times in milliseconds
+                const responseTimes = resolvedQueries.map(q => {
+                    const created = new Date(q.createdAt);
+                    const resolved = new Date(q.resolvedAt);
+                    return resolved - created; // Difference in milliseconds
+                });
+
+                // Sum the total time
+                const totalMillis = responseTimes.reduce((acc, time) => acc + time, 0);
+
+                // Calculate average and convert to minutes
+                const avgMillis = totalMillis / responseTimes.length;
+                avgMinutes = (avgMillis / 1000 / 60); // Avg in minutes
+            }
+
+            // Create data object for the chart
+            // We use .toFixed(1) to show one decimal place
+            const responseTimeData = {
+                'Avg. Time': avgMinutes.toFixed(1)
+            };
+
+            // --- 3. Build all the charts ---
+            createChart('category-chart', 'Queries by Type', categoryCounts, 'pie');
+            createChart('priority-chart', 'Queries by Priority', priorityCounts, 'doughnut');
+            createChart('status-chart', 'Queries by Status', statusCounts, 'bar');
+            createChart('source-chart', 'Queries by Source', sourceCounts, 'bar');
+
+            // Create the new bar chart
+            createChart('response-time-chart', 'Avg. Response Time (Minutes)', responseTimeData, 'bar');
+
+
+            loader.style.display = 'none';
+            grid.style.display = 'grid';
+
+        } catch (error) {
+            console.error('Error loading analytics:', error);
+            loader.style.display = 'none';
+            document.querySelector('.main-content').innerHTML += '<h2>Failed to load analytics data.</h2>';
+        }
+    }
+
+    // Helper function to create a Chart.js chart
+    function createChart(canvasId, title, data, type) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+
+        // Define colors
+        const backgroundColors = [
+            'rgba(49, 130, 206, 0.7)',
+            'rgba(237, 100, 166, 0.7)',
+            'rgba(56, 178, 172, 0.7)',
+            'rgba(245, 101, 101, 0.7)',
+            'rgba(237, 137, 54, 0.7)'
+        ];
+
+        const borderColors = [
+            'rgba(49, 130, 206, 1)',
+            'rgba(237, 100, 166, 1)',
+            'rgba(56, 178, 172, 1)',
+            'rgba(245, 101, 101, 1)',
+            'rgba(237, 137, 54, 1)'
+        ];
+
+        new Chart(ctx, {
+            type: type, // 'bar', 'pie', 'doughnut'
+            data: {
+                labels: Object.keys(data),
+                datasets: [{
+                    label: title,
+                    data: Object.values(data),
+                    backgroundColor: backgroundColors,
+                    borderColor: borderColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: (type === 'pie' || type === 'doughnut') ? 'bottom' : 'none',
+                    },
+                    title: {
+                        display: false,
+                        text: title
+                    }
+                },
+                scales: (type === 'bar') ? {
+                    y: {
+                        beginAtZero: true
+                    }
+                } : {}
+            }
+        });
+    }
+</script>
+</body>
+</html>
+
