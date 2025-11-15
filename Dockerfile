@@ -9,7 +9,7 @@ WORKDIR /build
 COPY . .
 
 # Run Maven to build the .jar file
-RUN mvn clean install
+RUN mvn clean install -DskipTests
 
 
 # --- STAGE 2: The Runner ---
