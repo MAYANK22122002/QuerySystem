@@ -1,6 +1,6 @@
 # --- STAGE 1: The Builder ---
 # Use an official Maven image (which includes Java 17) to build the project
-FROM maven:3.9.6-eclipse-temurin-17-jammy AS builder
+FROM maven:3-jdk-17 AS builder
 
 # Set the working directory for the build
 WORKDIR /build
