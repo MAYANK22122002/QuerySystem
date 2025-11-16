@@ -6,8 +6,8 @@
 
 This project is a complete, deployable web application built to solve the challenge of managing high volumes of audience queries. It centralizes all incoming messages, uses AI to automatically analyze and route them, and even sends automated AI-generated troubleshooting replies.
 
-![The Unified Inbox Dashboard](https://i.imgur.com/GZ5lG5c.png) 
-*(**Note:** Please replace this link with a real screenshot of your `index.html` dashboard!)*
+<img width="1910" height="872" alt="image" src="https://github.com/user-attachments/assets/b50c73d0-1fd5-4119-9611-584c07569ca3" />
+
 
 ---
 
