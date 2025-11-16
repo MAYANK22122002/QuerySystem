@@ -48,7 +48,7 @@
             font-size: 1.25rem;
             font-weight: 600;
         }
-        /* --- NEW: Form Group Styling --- */
+
         .form-group {
             margin-bottom: 15px;
         }
@@ -117,8 +117,8 @@
 </div>
 
 <script>
-    // --- NEW ENDPOINT ---
-    const API_URL = '/api/chat-submit'; // We'll create this in the controller
+
+    const API_URL = '/api/chat-submit';
 
     async function postQuery(event) {
         event.preventDefault();
@@ -126,7 +126,7 @@
         const content = document.getElementById('content').value;
         const email = document.getElementById('email').value;
 
-        // --- NEW REQUEST BODY ---
+
         const requestBody = {
             content: content,
             email: email

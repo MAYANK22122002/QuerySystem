@@ -161,8 +161,7 @@
         .btn-danger {
             background: #e53e3e;
             color: white;
-            /*font-size: 0.75rem;*/
-            /*padding: 4px 8px;*/
+
         }
         .btn-danger:hover {
             background: #c53030;
@@ -197,17 +196,17 @@
         .inbox-table td {
             font-size: 0.875rem;
             color: #2d3748;
-            /* Prevent long content from breaking layout */
+
             max-width: 250px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        /* Give content cell more space */
+
         .inbox-table th:nth-child(3),
         .inbox-table td:nth-child(3) {
             max-width: 300px;
-            /*width: 30%;*/
+
         }
 
         .inbox-table tr:last-child td {
@@ -218,12 +217,10 @@
         }
         .table-wrapper {
             width: 100%;
-            overflow-x: auto; /* This is the magic! */
+            overflow-x: auto;
         }
 
-        /* --- Button Styling --- */
 
-        /* --- Priority & Status Tags --- */
         .tag {
             display: inline-block;
             padding: 4px 10px;
@@ -248,13 +245,13 @@
             border-color: var(--priority-low-border);
         }
 
-        /* Status is now an editable select */
+
         .status-select {
             padding: 4px 8px;
             border-radius: 6px;
             border: 1px solid #cbd5e0;
             font-size: 0.875rem;
-            width: 120px; /* Give it a consistent width */
+            width: 120px;
         }
         .status-select[data-status="New"] {
             background: var(--status-new);
@@ -286,9 +283,9 @@
 
     </style>
 </head>
-<body onload="loadQueries()"> <!-- Load all queries when the page opens -->
+<body onload="loadQueries()">
 
-<!-- This is the professional sidebar -->
+
 <nav class="sidebar">
     <div class="sidebar-header">
         AI Inbox <span>Pro</span>
@@ -301,7 +298,7 @@
             </svg>
             Unified Inbox
         </a>
-        <!-- This link now correctly points to the analytics page -->
+
         <a href="/analytics.html">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 10px; vertical-align: middle;">
                 <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h-4V2zm-6 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12H5V2zM0 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12H0V2z"/>
@@ -318,7 +315,7 @@
     </div>
 </nav>
 
-<!-- This is the main application content -->
+
 <main class="main-content">
     <header class="main-header">
         <h1>Unified Inbox</h1>
@@ -358,7 +355,7 @@
         </form>
     </div>
 
-    <!-- This is the "shell" for our dynamic table -->
+
     <div class="card">
         <h2>Inbox</h2>
         <div class="loading-spinner" id="loader" style="display: block;"></div>
@@ -375,7 +372,7 @@
                 <th>Actions</th>
             </tr>
             </thead>
-            <!-- The JavaScript will fill this part -->
+
             <tbody id="inbox-table-body">
             </tbody>
         </table>
@@ -388,7 +385,7 @@
     const tableBody = document.getElementById('inbox-table-body');
     const loader = document.getElementById('loader');
 
-    // === 1. LOAD ALL QUERIES ===
+
     async function loadQueries() {
         loader.style.display = 'block';
         tableBody.innerHTML = ''; // Clear the table
@@ -413,10 +410,10 @@
         }
     }
 
-    // Helper function to build one table row
+
     function createQueryRow(query) {
         const row = document.createElement('tr');
-        row.setAttribute('title', query.content); // Show full text on hover
+        row.setAttribute('title', query.content);
 
         // 1. Priority
         const cellPriority = document.createElement('td');
@@ -450,10 +447,10 @@
         };
         cellStatus.appendChild(statusSelect);
 
-        // 6. Assigned To (Editable Select)
+
         const cellAssignedTo = document.createElement('td');
         const assignSelect = document.createElement('select');
-        assignSelect.className = 'status-select'; // Reuse the style
+        assignSelect.className = 'status-select';
 
         const teams = ["Unassigned", "Support Team A", "Support Team B", "Tech Team", "Billing"];
 
@@ -483,7 +480,7 @@
         replyButton.textContent = 'Reply';
         replyButton.style.marginRight = '5px'; // Add some spacing
         replyButton.onclick = () => {
-            // Show the AI reply in a simple popup
+
             alert('Suggested Reply:\n\n' + query.suggestedReply);
         };
         const deleteButton = document.createElement('button');
@@ -492,15 +489,14 @@
         deleteButton.onclick = () => deleteQuery(query.id);
         cellActions.append(replyButton, deleteButton);
 
-        // Add all cells to the row
+
         row.append(cellPriority, cellCategory, cellContent, cellSource, cellStatus, cellAssignedTo, cellActions);
         return row;
     }
 
-    // === 2. SUBMIT A NEW QUERY ===
-    // === 2. SUBMIT A NEW QUERY ===
+
     async function submitQuery(event) {
-        event.preventDefault(); // Stop the page from reloading!
+        event.preventDefault();
 
         const form = event.target;
         const content = form.elements.content.value;
@@ -515,7 +511,7 @@
         const createRequestBody = {
             content: content,
             source: source,
-            assignedTo: assignedTo // <-- Pass assignment in the first request
+            assignedTo: assignedTo
         };
 
         try {
@@ -529,17 +525,17 @@
                 throw new Error('Failed to create query.');
             }
 
-            // const newQuery = await createResponse.json(); // <-- No longer needed
+            // const newQuery = await createResponse.json(); //
 
             // If a team was assigned, call the update endpoint immediately
             // if (assignedTo !== 'Unassigned') {
             //     await updateAssignment(newQuery.id, assignedTo);
             // }
-            // ^-- THIS ENTIRE BLOCK IS NO LONGER NEEDED!
+            //
 
-            form.reset(); // Clear the form
-            document.getElementById('form-card').style.display = 'none'; // Hide the form
-            loadQueries(); // Reload the table
+            form.reset();
+            document.getElementById('form-card').style.display = 'none';
+            loadQueries();
 
         } catch (error) {
             console.error('Error submitting query:', error);
@@ -547,7 +543,7 @@
         }
     }
 
-    // === 3. DELETE A QUERY ===
+
     async function deleteQuery(id) {
         if (!confirm('Are you sure you want to delete this query?')) {
             return;
@@ -559,7 +555,7 @@
             });
 
             if (response.ok) {
-                loadQueries(); // Reload the table
+                loadQueries();
             } else {
                 alert('Failed to delete query.');
             }
@@ -584,12 +580,12 @@
 
             if (!response.ok) {
                 alert('Failed to update status.');
-                loadQueries(); // Revert on failure
+                loadQueries();
             }
         } catch (error) {
             console.error('Error updating status:', error);
             alert('An error occurred. Please try again.');
-            loadQueries(); // Revert on error
+            loadQueries();
         }
     }
 
@@ -608,12 +604,12 @@
 
             if (!response.ok) {
                 alert('Failed to update assignment.');
-                loadQueries(); // Revert
+                loadQueries();
             }
         } catch (error) {
             console.error('Error updating assignment:', error);
             alert('An error occurred. Please try again.');
-            loadQueries(); // Revert
+            loadQueries();
         }
     }
 </script>

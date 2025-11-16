@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Social Media Simulator</title>
     <style>
-        /* We'll use the same color palette as your main app */
+
         :root {
             --dark-blue: #1a202c;
             --light-blue: #2d3748;
@@ -26,7 +26,7 @@
             margin: 0;
         }
 
-        /* Header to look like your sidebar */
+
         .header {
             font-size: 1.5rem;
             font-weight: 600;
@@ -40,7 +40,7 @@
             color: var(--highlight);
         }
 
-        /* The main "tweet" card */
+
         .card {
             background: #ffffff;
             border-radius: 8px;
@@ -55,7 +55,7 @@
             font-weight: 600;
         }
 
-        /* Form elements */
+
         textarea {
             width: 100%;
             padding: 10px;
@@ -115,11 +115,11 @@
 </div>
 
 <script>
-    // This is the API endpoint you already built
+
     const API_URL = '/api/queries';
 
     async function postQuery(event) {
-        event.preventDefault(); // Stop the form from reloading the page
+        event.preventDefault();
 
         const content = document.getElementById('content').value;
         if (!content) {
@@ -129,8 +129,8 @@
 
         const requestBody = {
             content: content,
-            source: "Social Media", // Hard-code the source!
-            assignedTo: "Unassigned"  // Let the AI escalation handle it
+            source: "Social Media",
+            assignedTo: "Unassigned"
         };
 
         try {
@@ -141,11 +141,11 @@
             });
 
             if (response.ok) {
-                // Show success
+
                 document.getElementById('success-message').style.display = 'block';
                 document.getElementById('content').value = ''; // Clear the box
 
-                // Hide the message after 3 seconds
+
                 setTimeout(() => {
                     document.getElementById('success-message').style.display = 'none';
                 }, 3000);

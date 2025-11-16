@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-// This annotation turns our controller into a professional JSON API
+
 @RestController
-@RequestMapping("/api") // All our API routes will start with this
+@RequestMapping("/api")
 public class QueryController {
 
     @Autowired
@@ -25,7 +25,7 @@ public class QueryController {
 
     @PostMapping("/queries")
     public ResponseEntity<Query> createQuery(@RequestBody CreateQueryRequest request) {
-        // Pass all three fields to the service
+
         Query newQuery = queryService.createNewQuery(request.getContent(), request.getSource(), request.getAssignedTo());
         return ResponseEntity.ok(newQuery);
     }
@@ -39,8 +39,7 @@ public class QueryController {
 
 
 
-    // --- FEATURE: UPDATE a Query's Status ---
-    // This method UPDATES a query's status
+
     @PutMapping("/queries/{id}/status")
     public ResponseEntity<Query> updateQueryStatus(
             @PathVariable Long id,
@@ -49,7 +48,7 @@ public class QueryController {
         return ResponseEntity.ok(updatedQuery);
     }
 
-    // --- FEATURE: UPDATE a Query's Assignment ---
+
     @PutMapping("/queries/{id}/assignment")
     public ResponseEntity<Query> updateQueryAssignment(
             @PathVariable Long id,
@@ -60,17 +59,17 @@ public class QueryController {
     @PostMapping("/chat-submit")
     public ResponseEntity<Void> submitChatQuery(@RequestBody ChatSubmitRequest request) {
 
-        // 1. Create the query (this also generates the AI reply)
+
         Query newQuery = queryService.createNewQuery(
                 request.getContent(),
-                "Chat",               // Hard-code the source
-                "Unassigned"          // Let escalation handle assignment
+                "Chat",
+                "Unassigned"
         );
 
-        // 2. Get the AI-generated reply that was saved to the query
+
         String aiReply = newQuery.getSuggestedReply();
 
-        // 3. Send the auto-reply to the user's provided email
+
         emailService.sendAutoReply(
                 request.getEmail(),
                 "Re: Your Chat Query",
@@ -103,19 +102,19 @@ public class QueryController {
         public String getSource() { return source; }
         public void setSource(String source) { this.source = source; }
 
-        // <-- ADD THESE GETTERS AND SETTERS -->
+
         public String getAssignedTo() { return assignedTo; }
         public void setAssignedTo(String assignedTo) { this.assignedTo = assignedTo; }
     }
 
     static class UpdateStatusRequest {
         private String status;
-        // getter and setter
+
         public String getStatus() { return status; }
         public void setStatus(String status) { this.status = status; }
     }
 
-    // --- Helper Class for the new JSON request ---
+    // Helper Class for the new JSON request
     static class UpdateAssignmentRequest {
         private String assignedTo;
         // getter and setter

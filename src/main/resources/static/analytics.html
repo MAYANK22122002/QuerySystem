@@ -7,7 +7,7 @@
     <!-- We need the Chart.js library to draw charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- We will re-use the *exact* same CSS from index.html -->
+
     <style>
         :root {
             --dark-blue: #1a202c;
@@ -51,7 +51,7 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            flex-shrink: 0; /* Prevents sidebar from shrinking */
+            flex-shrink: 0;
         }
         .sidebar-header {
             font-size: 1.5rem;
@@ -136,7 +136,7 @@
         }
     </style>
 </head>
-<body onload="loadAnalytics()"> <!-- Load analytics on page load -->
+<body onload="loadAnalytics()">
 
 <!-- Sidebar -->
 <nav class="sidebar">
@@ -144,14 +144,14 @@
         AI Inbox <span>Pro</span>
     </div>
     <div class="sidebar-nav">
-        <!-- Link back to the inbox -->
+
         <a href="/index.html">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 10px; vertical-align: middle;">
                 <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555zM0 4.697v7.104l5.803-3.558L0 4.697zM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757zm3.436-.586L16 11.801V4.697l-5.803 3.546z"/>
             </svg>
             Unified Inbox
         </a>
-        <!-- This is now the active page -->
+
         <a href="/analytics.html" class="active">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 10px; vertical-align: middle;">
                 <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h-4V2zm-6 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12H5V2zM0 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12H0V2z"/>
@@ -176,7 +176,7 @@
 
     <div class="loading-spinner" id="loader" style="display: block;"></div>
 
-    <!-- This grid will hold our charts -->
+
     <div class="chart-grid" id="chart-grid-container" style="display: none;">
         <div class="card">
             <h2>Queries by Type</h2>
@@ -243,44 +243,43 @@
                 return acc;
             }, {});
 
-            // --- 2. NEW: Calculate Average Response Time ---
 
-            // Filter for only queries that are Resolved AND have both timestamps
+
+
             const resolvedQueries = queries.filter(q =>
                 q.status === 'Resolved' && q.createdAt && q.resolvedAt
             );
 
-            let avgMinutes = 0; // Default to 0
+            let avgMinutes = 0;
 
             if (resolvedQueries.length > 0) {
-                // Map to an array of response times in milliseconds
+
                 const responseTimes = resolvedQueries.map(q => {
                     const created = new Date(q.createdAt);
                     const resolved = new Date(q.resolvedAt);
-                    return resolved - created; // Difference in milliseconds
+                    return resolved - created;
                 });
 
-                // Sum the total time
+
                 const totalMillis = responseTimes.reduce((acc, time) => acc + time, 0);
 
-                // Calculate average and convert to minutes
+
                 const avgMillis = totalMillis / responseTimes.length;
-                avgMinutes = (avgMillis / 1000 / 60); // Avg in minutes
+                avgMinutes = (avgMillis / 1000 / 60);
             }
 
-            // Create data object for the chart
-            // We use .toFixed(1) to show one decimal place
+
             const responseTimeData = {
                 'Avg. Time': avgMinutes.toFixed(1)
             };
 
-            // --- 3. Build all the charts ---
+
             createChart('category-chart', 'Queries by Type', categoryCounts, 'pie');
             createChart('priority-chart', 'Queries by Priority', priorityCounts, 'doughnut');
             createChart('status-chart', 'Queries by Status', statusCounts, 'bar');
             createChart('source-chart', 'Queries by Source', sourceCounts, 'bar');
 
-            // Create the new bar chart
+
             createChart('response-time-chart', 'Avg. Response Time (Minutes)', responseTimeData, 'bar');
 
 
@@ -294,7 +293,7 @@
         }
     }
 
-    // Helper function to create a Chart.js chart
+
     function createChart(canvasId, title, data, type) {
         const ctx = document.getElementById(canvasId).getContext('2d');
 

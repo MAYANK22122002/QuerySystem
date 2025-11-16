@@ -13,15 +13,15 @@ import java.io.IOException;
 @Service
 public class EmailService {
 
-    // Inject the "from" email (must be your verified SendGrid sender)
+
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    // Inject the escalation email address
+
     @Value("${escalation.email.to}")
     private String escalationEmailTo;
 
-    // Inject the new SendGrid API key
+
     @Value("${sendgrid.api.key}")
     private String sendgridApiKey;
 
@@ -44,7 +44,7 @@ public class EmailService {
         Content content = new Content("text/plain", emailBody);
         Mail mail = new Mail(from, subject, to, content);
 
-        // Send the email via SendGrid's HTTP API
+
         SendGrid sg = new SendGrid(sendgridApiKey);
         Request request = new Request();
         try {

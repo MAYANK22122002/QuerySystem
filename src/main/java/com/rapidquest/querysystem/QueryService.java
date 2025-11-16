@@ -259,8 +259,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-// import org.springframework.web.client.RestTemplate; // <-- WE NO LONGER NEED THIS
-import org.springframework.web.reactive.function.client.WebClient; // <-- IMPORT THIS
+
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.Instant;
 import java.util.List;
@@ -275,17 +275,14 @@ public class QueryService {
     @Autowired
     private EmailService emailService;
 
-    // --- NEW: INJECTED BEANS ---
-    // Spring Boot automatically provides these beans for us
+
     @Autowired
     private WebClient.Builder webClientBuilder;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    // --- REMOVED ---
-    // private final RestTemplate restTemplate = new RestTemplate();
-    // private final ObjectMapper objectMapper = new ObjectMapper();
+
 
     @Value("${gemini.api.key}")
     private String apiKey;
@@ -295,55 +292,55 @@ public class QueryService {
 
 
     public List<Query> getAllQueries() {
-        return queryRepository.findAllByOrderByIdDesc(); // (Assuming you made this optimization)
+        return queryRepository.findAllByOrderByIdDesc();
         // Or:
         // return queryRepository.findAll().stream()
         //        .sorted((q1, q2) -> q2.getId().compareTo(q1.getId()))
         //        .toList();
     }
 
-    // --- THIS LOGIC IS NOW UPDATED FOR ESCALATION ---
+
     public Query createNewQuery(String content, String source, String assignedTo) {
 
 
-        // 1. Get AI-powered analytics for the content
+
         AiResponse aiData = getAiAnalytics(content);
 
-        // 2. Create a new Query object
+
         Query newQuery = new Query();
         newQuery.setCreatedAt(Instant.now());
         newQuery.setContent(content);
         newQuery.setSource(source);
         newQuery.setSuggestedReply(aiData.getSuggestedReply());
-        // 3. Set properties from the AI response
+
         newQuery.setCategory(aiData.getCategory());
 
-        Priority priority = Priority.valueOf(aiData.getPriority()); // Get priority from AI
+        Priority priority = Priority.valueOf(aiData.getPriority());
         newQuery.setPriority(priority);
 
-        // 4. SET STATUS AND RUN ESCALATION LOGIC
+
         newQuery.setStatus("New");
 
         if (priority == Priority.High) {
-            // --- THIS IS THE ESCALATION RULE ---
+
             newQuery.setAssignedTo("Tech Team");
 
-            // --- SEND EMAIL NOTIFICATION ---
+
             Query savedQuery = queryRepository.save(newQuery);
-            emailService.sendEscalationNotification(savedQuery); // (Uncomment if you have EmailService)
+            emailService.sendEscalationNotification(savedQuery);
             return savedQuery;
 
         } else {
-            // Otherwise, just use the assignment from the form
+
             newQuery.setAssignedTo(assignedTo);
         }
 
-        // 5. Save and return the new query (only for non-escalated)
+
         return queryRepository.save(newQuery);
     }
 
 
-    // (Other methods like deleteQuery, updateQueryStatus, etc. are unchanged)
+
     // --- DELETE METHOD ---
     public void deleteQuery(Long id) {
         queryRepository.deleteById(id);
@@ -354,7 +351,7 @@ public class QueryService {
         Query query = queryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Query not found with id: " + id));
 
-        // In updateQueryStatus()
+
         if (status.equals("Resolved")) {
             query.setStatus("Resolved");
             query.setResolvedAt(Instant.now()); // Set the resolution time!
@@ -415,7 +412,7 @@ public class QueryService {
     }
 
     /**
-     * This is our "Simulated AI" fallback. (No changes here)
+     * This is our "Simulated AI" fallback.
      */
     private AiResponse getFallbackAnalytics(String content) {
         String category = "Question"; // Default
@@ -437,7 +434,7 @@ public class QueryService {
     }
 
 
-    // --- DTO Helper Classes --- (No changes here)
+    // --- DTO Helper Classes ---
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     private static class AiResponse {
@@ -486,6 +483,6 @@ public class QueryService {
         }
     }
 
-    // (Assuming you added this enum)
+
 
 }
