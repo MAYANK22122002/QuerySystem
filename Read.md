@@ -22,7 +22,7 @@ This project is a complete, production-ready web application built to solve the 
 
 ## 📹 Demo Video
 
-*[**Link to My 5-Minute Demo Video**](https://www.example.com) (Please add your video link here!)*
+*[**Link to My 5-Minute Demo Video**](https://drive.google.com/file/d/1CEadNAz2RtDVwrOXC8DEPTTaOqo7VF3z/view?usp=sharing)*
 
 ---
 
